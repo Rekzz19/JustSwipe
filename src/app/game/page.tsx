@@ -1,6 +1,6 @@
 'use client'
 
-import Questions from "@/src/components/Questions";
+import Questions from "@/src/components/generateQuestions/Questions";
 
 
 export default function Game(){
