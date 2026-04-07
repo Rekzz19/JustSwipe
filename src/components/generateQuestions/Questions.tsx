@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 
+import { getRandomIndex } from "@/src/utils/getRandomIndex";
+
 interface Question {
     question : string,
     answer : any,
@@ -34,16 +36,11 @@ const basketballQuestions: Question[] = [
 
 export default function Questions(){
 
-    //generate random index for the questions array
-    function getRandomIndex() : number {
-        return Math.floor(Math.random() * basketballQuestions.length);
-    }
-
     //const randomIndex = getRandomIndex();
     const [ index, setIndex ] = useState<number | null>(null);
 
     useEffect(() => {
-        setIndex(getRandomIndex());
+        setIndex(getRandomIndex(basketballQuestions.length));
     }, []);
 
 
@@ -63,7 +60,7 @@ export default function Questions(){
             }else if(eventData.dir == 'Left' && question.answer.position == 'Left'){
                 console.log("left");
             }
-            setIndex(getRandomIndex());
+            setIndex(getRandomIndex(basketballQuestions.length));
         }
     });
     
