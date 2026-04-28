@@ -1,6 +1,8 @@
 pipeline{
+    agent any
+
     stages{
-        stage('Deploy'){
+        stage('Build'){
             //build docker image - this tells docker to build an image using the dockerfile
             steps {
                 echo 'Building Docker image...'
