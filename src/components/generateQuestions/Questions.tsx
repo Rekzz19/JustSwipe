@@ -21,7 +21,7 @@ export default function Questions( {question, swip } : QuestionsProps){
             </div>
             
             <div>
-                <img src={question.imageB} alt={question.option.name} className="w-32 h-32 object-cover"/>
+                <img src={question.imageB} alt={question.option} className="w-32 h-32 object-cover"/>
                 <p>{question.option}</p>
             </div>
             

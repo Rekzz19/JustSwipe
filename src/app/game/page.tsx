@@ -20,19 +20,19 @@ const basketballQuestions: Question[] = [
         'answer' : {'name' : "Kawhi Leonard", 'position': "Left"},
         'option' : "me",
         'imageA' : "images/Kawhi.jpeg",
-        'imageB' : "images/klay.jpeg"
+        'imageB' : "images/Klay.jpeg"
     },
     { "question" : "who won the NBA playoffs final in 2020",
         'answer' : {'name' : "Kawhi Leonard", 'position': "Left"},
         'option' : "me",
         'imageA' : "images/Kawhi.jpeg",
-        'imageB' : "images/klay.jpeg"
+        'imageB' : "images/Klay.jpeg"
     },
     { "question" : "who won the NBA playoffs final in 2016",
         'answer' : {'name' : "Klay", 'position': "Right"},
         'option' : "me",
         'imageB' : "images/Kawhi.jpeg",
-        'imageA' : "images/klay.jpeg"
+        'imageA' : "images/Klay.jpeg"
     }   
 ]
 
