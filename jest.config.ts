@@ -23,3 +23,5 @@ const config: Config = {
 };
 
 export default createJestConfig(config);
+
+//modulePathIgnorePatterns: ["<rootDir>/.next/"],
