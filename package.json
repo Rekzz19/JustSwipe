@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "cross-env NODE_ENV=test jest"
   },
   "dependencies": {
     "next": "^16.2.4",

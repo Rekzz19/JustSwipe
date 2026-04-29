@@ -13,7 +13,7 @@ pipeline{
         stage('Test'){
             steps {
                 echo 'Running tests...'
-                sh 'docker run --rm nextjs-app npm test'
+                sh 'docker run --rm -e NODE_ENV=test nextjs-app npm test'
             }
         }
 
