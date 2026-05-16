@@ -36,12 +36,6 @@ const basketballQuestions: Question[] = [
     }   
 ]
 
-// function handleTimeOut(){
-
-// }
-
-
-
 export default function Game(){
 
     //const randomIndex = getRandomIndex();
@@ -86,7 +80,7 @@ export default function Game(){
     }
     const question = basketballQuestions[index];
 
-    return <div className='flex flex-col justify-center items-center min-h-screen'>
+    return <div className='flex flex-col items-center min-h-screen bg-[#0C2340]'>
 
         <Timer swipCount={swipeCount} onTimeUp={handleTimeOut}/>
         <Questions question={question} swip={handlers}/>
