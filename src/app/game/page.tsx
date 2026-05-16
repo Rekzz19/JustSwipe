@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 
 import { getRandomIndex } from "@/src/utils/getRandomIndex";
-import Questions from "@/src/components/generateQuestions/Questions";
+import Questions from "@/src/components/playerQuestions/Questions";
 import Timer from "@/src/components/questionTimer/Timer";
 
 export interface Question {

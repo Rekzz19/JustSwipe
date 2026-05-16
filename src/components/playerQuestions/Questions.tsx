@@ -1,5 +1,7 @@
 import { Question } from "@/src/app/game/page";
 import { SwipeableHandlers } from "react-swipeable";
+import QuestionCard from "./QuestionCard";
+import PlayersCard from "./PlayerCard";
 
 type QuestionsProps = {
     question: Question,
@@ -9,47 +11,13 @@ type QuestionsProps = {
 export default function Questions( {question, swip } : QuestionsProps){
 
     return <div className="mt-4 p-5"> 
-        <div className="wolves-card flex flex-col rounded-xl p-4 
-            text-[24px]
-            font-semibold
-            uppercase
-            tracking-[1px]
-            font-bebas
-            
-        " > 
-            <p>{question.question}</p> 
-        </div> 
+
+        <QuestionCard question={question}/>
+
         <div {...swip} className="mt-6">
             <div className="flex gap-4">
-                {/* Player A */}
-                <div className="player-card relative flex-1 aspect-[0.68]">
-                <img
-                    src={question.imageA}
-                    alt={question.answer.name}
-                    className="h-full w-full object-cover"
-                />
-
-                <div className="player-overlay">
-                    <p className="player-name text-[25px] leading-[0.9] font-bebas">
-                    {question.answer.name}
-                    </p>
-                </div>
-                </div>
-
-                {/* Player B */}
-                <div className="player-card relative flex-1 aspect-[0.68]">
-                <img
-                    src={question.imageB}
-                    alt={question.option}
-                    className="h-full w-full object-cover"
-                />
-
-                <div className="player-overlay">
-                    <p className="player-name text-[25px] leading-[0.9] font-bebas">
-                    {question.option}
-                    </p>
-                </div>
-                </div>
+                <PlayersCard image= {question.imageA} name={question.answer.name}/>
+                <PlayersCard image= {question.imageB} name={question.option}/>
             </div>
         </div>
     </div>
