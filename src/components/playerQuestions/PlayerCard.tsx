@@ -20,24 +20,34 @@ export default function PlayersCard( { image, name, onSwipe, direction } : Playe
 
             // Restrict swipe direction
             dragConstraints={{
-                left: direction === "left" ? -25 : 0,
-                right: direction === "right" ? 25 : 0,
+                left: direction === "left" ? -70 : 0,
+                right: direction === "right" ? 70 : 0,
             }}
 
-            dragElastic={0.15}
+            dragElastic={0}
             dragMomentum={false}
             style={{ x, rotate }}
             className="player-card relative flex-1 aspect-[0.68]"
+            onDrag={() => {
+                if (direction === "left" && x.get() > 0) {
+                    x.set(0);
+                }
+            
+                if (direction === "right" && x.get() < 0) {
+                    x.set(0);
+                }
+            }}
+            
             onDragEnd={(e, info) => {
                 const offset = info.offset.x;
 
                 // LEFT CARD
-                if (direction === "left" && offset < -100) {
+                if (direction === "left" && offset < -50) {
                     onSwipe("left");
                 }   
 
                 // RIGHT CARD
-                if (direction === "right" && offset > 100) {
+                if (direction === "right" && offset > 50) {
                     onSwipe("right");
                 }
                 animate(x, 0, {
