@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useSwipeable } from "react-swipeable";
 
 import { getRandomIndex } from "@/src/utils/getRandomIndex";
 import Questions from "@/src/components/playerQuestions/Questions";
@@ -17,19 +16,19 @@ export interface Question {
 
 const basketballQuestions: Question[] = [
     { "question" : "who won the NBA playoffs final in 2019",
-        'answer' : {'name' : "Kawhi Leonard", 'position': "Left"},
+        'answer' : {'name' : "Kawhi Leonard", 'position': "left"},
         'option' : "me",
         'imageA' : "images/Kawhi.jpeg",
         'imageB' : "images/Klay.jpeg"
     },
     { "question" : "who won the NBA playoffs final in 2020",
-        'answer' : {'name' : "Kawhi Leonard", 'position': "Left"},
+        'answer' : {'name' : "Kawhi Leonard", 'position': "left"},
         'option' : "me",
         'imageA' : "images/Kawhi.jpeg",
         'imageB' : "images/Klay.jpeg"
     },
     { "question" : "who won the NBA playoffs final in 2016",
-        'answer' : {'name' : "Klay", 'position': "Right"},
+        'answer' : {'name' : "Klay", 'position': "right"},
         'option' : "me",
         'imageB' : "images/Kawhi.jpeg",
         'imageA' : "images/Klay.jpeg"
@@ -46,6 +45,8 @@ export default function Game(){
         setIndex(getRandomIndex(basketballQuestions.length));
     }, []);
 
+
+    //this function generates a random question when the timer is out
     const handleTimeOut = () => {
         setIndex(getRandomIndex(basketballQuestions.length));
         setSwipeCount((c) => c + 1);
@@ -53,27 +54,20 @@ export default function Game(){
 
 
     //swipe function - check that answer is correct
-    const handlers = useSwipeable({
-        onSwiped: (eventData) => {
+    const handlers = (direction: string) => {
 
-            if (index === null)return;
+        if (index === null)return; //index is state
 
-            const question = basketballQuestions[index];
+        const question = basketballQuestions[index]; //take question from the array
 
-            if (eventData.dir == 'Right' && question.answer.position == 'Right'){ //maybe use case
-                //action like add score 
-                console.log("right");
-                
-
-                
-            }else if(eventData.dir == 'Left' && question.answer.position == 'Left'){
-                console.log("left");
-            }
-            setIndex(getRandomIndex(basketballQuestions.length));
-            setSwipeCount((c) => c + 1);
-
+        if (question.answer.position === direction){ //maybe use case
+            //action like add score 
+            console.log("right");
         }
-    });
+        setIndex(getRandomIndex(basketballQuestions.length));
+        setSwipeCount((c) => c + 1);
+
+    }
     
     if (index === null) {
         return <p>Loading...</p>;
@@ -83,7 +77,7 @@ export default function Game(){
     return <div className='flex flex-col items-center min-h-screen bg-[#0C2340]'>
 
         <Timer swipCount={swipeCount} onTimeUp={handleTimeOut}/>
-        <Questions question={question} swip={handlers}/>
+        <Questions question={question} handleSwipe={handlers}/>
 
     </div>
     
