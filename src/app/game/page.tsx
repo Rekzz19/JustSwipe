@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { getRandomIndex } from "@/src/utils/getRandomIndex";
 import Questions from "@/src/components/playerQuestions/Questions";
 import Timer from "@/src/components/questionTimer/Timer";
+import setPlayerScore from "@/src/utils/setPlayerScore";
 
 export interface Question {
     question : string,
@@ -36,7 +38,7 @@ const basketballQuestions: Question[] = [
 ]
 
 export default function Game(){
-
+    const router = useRouter();
     //const randomIndex = getRandomIndex();
     const [ index, setIndex ] = useState<number | null>(null);
     const [ swipeCount, setSwipeCount ] = useState(0);
@@ -55,17 +57,21 @@ export default function Game(){
 
     //swipe function - check that answer is correct
     const handlers = (direction: string) => {
+        let score = 0;
 
         if (index === null)return; //index is state
 
         const question = basketballQuestions[index]; //take question from the array
 
-        if (question.answer.position === direction){ //maybe use case
-            //action like add score 
-            console.log("right");
+        if (question.answer.position === direction){ 
+            score++;
         }
         setIndex(getRandomIndex(basketballQuestions.length));
         setSwipeCount((c) => c + 1);
+
+        if (swipeCount === 5){
+            router.push("/score");
+        }
 
     }
     
