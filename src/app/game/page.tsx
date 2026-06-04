@@ -1,12 +1,11 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 import { getRandomIndex } from "@/src/utils/getRandomIndex";
 import Questions from "@/src/components/playerQuestions/Questions";
 import Timer from "@/src/components/questionTimer/Timer";
-import setPlayerScore from "@/src/utils/setPlayerScore";
 
 export interface Question {
     question : string,
@@ -42,6 +41,7 @@ export default function Game(){
     //const randomIndex = getRandomIndex();
     const [ index, setIndex ] = useState<number | null>(null);
     const [ swipeCount, setSwipeCount ] = useState(0);
+    const [ score, setScore ] = useState(0);
 
     useEffect(() => {
         setIndex(getRandomIndex(basketballQuestions.length));
@@ -49,32 +49,35 @@ export default function Game(){
 
 
     //this function generates a random question when the timer is out
-    const handleTimeOut = () => {
+    const handleTimeOut = useCallback(() => {
         setIndex(getRandomIndex(basketballQuestions.length));
         setSwipeCount((c) => c + 1);
-    }
+    },[])
 
+    useEffect(() => {
+        console.log("swipeCount changed:", swipeCount);
+    }, [swipeCount]);
 
     //swipe function - check that answer is correct
     const handlers = (direction: string) => {
-        let score = 0;
 
         if (index === null)return; //index is state
 
         const question = basketballQuestions[index]; //take question from the array
 
         if (question.answer.position === direction){ 
-            score++;
+            setScore(prevScore => prevScore + 1);
         }
         setIndex(getRandomIndex(basketballQuestions.length));
         setSwipeCount((c) => c + 1);
-
-        if (swipeCount === 5){
-            router.push("/score");
-        }
-
     }
-    
+    useEffect(() => {
+        if (swipeCount === 5){
+            router.push(`/score?score=${score}`);
+        }
+    }, [swipeCount, score, router])
+
+
     if (index === null) {
         return <p>Loading...</p>;
     }
@@ -82,7 +85,7 @@ export default function Game(){
 
     return <div className='flex flex-col items-center min-h-screen bg-[#0C2340]'>
 
-        <Timer swipCount={swipeCount} onTimeUp={handleTimeOut}/>
+        <Timer swipeCount={swipeCount} onTimeUp={handleTimeOut}/>
         <Questions question={question} handleSwipe={handlers}/>
 
     </div>

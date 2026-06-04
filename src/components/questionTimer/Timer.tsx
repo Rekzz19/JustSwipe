@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 type TimeProps = {
-    swipCount : number;
-    onTimeUp : () => void;
+    swipeCount : number;
+    onTimeUp : () => void; //creates a new question and increments c
 }
 
-export default function Timer({ swipCount, onTimeUp } : TimeProps){
+export default function Timer({ swipeCount, onTimeUp } : TimeProps){
 
     const [timer, setTimer] = useState <number>(5);
+    const hasCalledTimeUp = useRef(false);
 
-    //here when swipecount changes, which it does for everyswipe then timer starts again at 10
+    //here when swipecount changes, which it does for everyswipe then timer starts again at 5
     useEffect(() => {
         setTimer(5);
+        hasCalledTimeUp.current = false;
 
         const interval = setInterval(() => {
             setTimer((time) => {
@@ -19,16 +21,17 @@ export default function Timer({ swipCount, onTimeUp } : TimeProps){
                 return time - 1;
             });
         }, 1000);
-
         return () => clearInterval(interval);
-    }, [swipCount]);
+    }, [swipeCount]);
 
-    //here i handle timeup
+    
+
     useEffect(() => {
-        if (timer === 0) {
+        if (timer === 0 && !hasCalledTimeUp.current){
+            hasCalledTimeUp.current = true
             onTimeUp();
         }
-    }, [timer, onTimeUp]);
+    }, [timer, onTimeUp])
     
 
     return <div>
