@@ -105,9 +105,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-bebas: var(--font-bebas);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-bebas: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
