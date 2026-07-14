@@ -25,7 +25,7 @@ const basketballQuestions: Question[] = [
       question: "Who won the NBA Finals MVP in 2019?",
       answer: { name: "Kawhi Leonard", position: "left" },
       option: "Klay Thompson",
-      imageA: "/images/Kawhi.jpeg",
+      imageA: "/images/Kawhi-leonard.jpg",
       imageB: "/images/Klay.jpeg"
     },
     {
@@ -39,7 +39,7 @@ const basketballQuestions: Question[] = [
       question: "Who is the NBA's all-time leading scorer?",
       answer: { name: "LeBron James", position: "left" },
       option: "Kareem Abdul-Jabbar",
-      imageA: "/images/lebron-james.avif",
+      imageA: "/images/lebron-James.avif",
       imageB: "/images/kareem.avif"
     },
     {
@@ -96,7 +96,7 @@ const basketballQuestions: Question[] = [
       answer: { name: "LeBron James", position: "left" },
       option: "Kawhi Leonard",
       imageA: "/images/lebron-James.avif",
-      imageB: "/images/Kawhi.jpeg"
+      imageB: "/images/Kawhi-leonard.jpg"
     },
     {
       question: "Who is nicknamed 'The Greek Freak'?",
@@ -140,6 +140,7 @@ export default function Game(){
     //this function generates a random question when the timer is out
     const handleTimeOut = useCallback(() => {
         setIndex(getRandomIndex(basketballQuestions.length));
+        setTimer(5);
         setSwipeCount((c) => c + 1);
     },[])
 
