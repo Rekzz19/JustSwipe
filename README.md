@@ -1,4 +1,5 @@
 # JustSwipe
+
 I am passionate about software engineering and will use this project as an opportunity to explore and apply industry tools such as Docker, Jenkins, and AWS, while deepening my understanding of software engineering concepts and further developing my development skills.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
