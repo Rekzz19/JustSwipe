@@ -6,20 +6,25 @@ import { useRouter } from 'next/navigation';
 import { getRandomIndex } from '@/utils/getRandomIndex';
 import Questions from '../components/playerQuestions/Questions';
 import Timer from '../components/questionTimer/Timer';
+import { getQuestions } from '../aws/getDynamodbQuestions';
 
-type Answer = {
-    name: string;
-    position: 'left' | 'right';
-};
-
-export interface Question {
-    question: string;
-    answer: Answer;
-    option: string;
-    imageA: string;
-    imageB: string;
+interface Option {
+    id: string;
+    text: string;
 }
 
+export interface Question {
+    active: boolean;
+    options: Option[];
+    correctOptionId: string;
+    category: string;
+    question: string;
+    ID: string;
+
+    //imageA: string;
+    //imageB: string;
+}
+/*
 const basketballQuestions: Question[] = [
     {
         question: 'Who won the NBA Finals MVP in 2019?',
@@ -127,18 +132,42 @@ const basketballQuestions: Question[] = [
         imageB: '/images/David-Robinson.jpg',
     },
 ];
+*/
 
 export default function Game() {
+    let dynamoDbQuestions: [];
+
+    /**
+     * console.log(response.Item?.questions[0]?.question);
+     * DYNAMODBQuestions.
+     */
+
     const router = useRouter();
-    //const randomIndex = getRandomIndex();
-    const [index, setIndex] = useState(() => getRandomIndex(basketballQuestions.length));
+    const [currentQuestion, setQuestions] = useState<Question[]>([]); //explain this line
+    const [currentQuestionIndex, setQuestionIndex] = useState(0);
     const [swipeCount, setSwipeCount] = useState(0);
     const [score, setScore] = useState(0);
     const [timer, setTimer] = useState<number>(5);
 
+    //const question = dynamoDbQuestions.Item?.questions[currentQuestion];
+    //====USE EFFECT TO LOAD QUESTIONS ======
+    useEffect(() => {
+        async function loadQuestions() {
+            const response = await fetch('/api/questions');
+            const data = await response.json();
+            const result = data.questions;
+
+            //on every render it will be recreated if i used a variable
+            setQuestions(result); //all the questions - set once
+            console.log('this is a result ' + result);
+        }
+
+        loadQuestions();
+    }, []);
+
     //this function generates a random question when the timer is out
     const handleTimeOut = useCallback(() => {
-        setIndex(getRandomIndex(basketballQuestions.length));
+        setQuestionIndex((c) => c + 1); //-DYNAMODB Question increments
         setTimer(5);
         setSwipeCount((c) => c + 1);
     }, []);
@@ -150,14 +179,14 @@ export default function Game() {
     //swipe function - check that answer is correct
     const handlers = (direction: string) => {
         setTimer(5);
-        if (index === null) return; //index is state
+        //if (index === null) return; //index is state
 
-        const question = basketballQuestions[index]; //take question from the array
+        //const question = basketballQuestions[index]; //take question from the array
 
-        if (question.answer.position === direction) {
+        if (question.correctOptionId === 'A' ? 'left' : 'right' === direction) {
             setScore((prevScore) => prevScore + 1);
         }
-        setIndex(getRandomIndex(basketballQuestions.length));
+        //setIndex(getRandomIndex(basketballQuestions.length));
         setSwipeCount((c) => c + 1);
     };
 
@@ -169,10 +198,11 @@ export default function Game() {
         }
     }, [swipeCount, score, router]);
 
-    if (index === null) {
+    const question = currentQuestion[currentQuestionIndex];
+    console.log('this is a test' + currentQuestion[currentQuestionIndex]);
+    if (!question) {
         return <p>Loading...</p>;
     }
-    const question = basketballQuestions[index];
 
     return (
         <div className="flex flex-col items-center min-h-screen bg-[#0C2340]">

@@ -12,7 +12,7 @@ export default function Questions({ question, handleSwipe }: QuestionsProps) {
         <div className="mt-4 p-5">
             <QuestionCard question={question} />
 
-            <div className="mt-6">
+            {/*<div className="mt-6">
                 <div className="flex gap-4">
                     <PlayersCard
                         direction="left"
@@ -27,7 +27,7 @@ export default function Questions({ question, handleSwipe }: QuestionsProps) {
                         onSwipe={handleSwipe}
                     />
                 </div>
-            </div>
+            </div>*/}
         </div>
     );
 }
