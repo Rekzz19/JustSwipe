@@ -143,7 +143,11 @@ export default function Game() {
     useEffect(() => {
         async function loadQuestions() {
             const response = await fetch('/api/questions');
-            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`Questions request failed; ${response.status}`);
+            }
+            const data = await response.json(); //what is this does not run, you need to handle the errors
 
             setQuestions(data.questions); //all the questions - set once
         }
