@@ -6,7 +6,7 @@ export async function GET() {
 
     const response = await getS3PlayerImages(questions);
     //console.log('API:' + response);
-    console.log(response);
+    //console.log(response);
 
     return Response.json({
         questions: response ?? [],
