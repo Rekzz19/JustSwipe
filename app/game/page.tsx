@@ -3,10 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { getRandomIndex } from '@/utils/getRandomIndex';
 import Questions from '../components/playerQuestions/Questions';
 import Timer from '../components/questionTimer/Timer';
-import { getQuestions } from '../aws/getDynamodbQuestions';
 
 interface Option {
     id: string;
@@ -20,9 +18,8 @@ export interface Question {
     category: string;
     question: string;
     ID: string;
-
-    //imageA: string;
-    //imageB: string;
+    imageA: string;
+    imageB: string;
 }
 /*
 const basketballQuestions: Question[] = [
@@ -135,31 +132,20 @@ const basketballQuestions: Question[] = [
 */
 
 export default function Game() {
-    let dynamoDbQuestions: [];
-
-    /**
-     * console.log(response.Item?.questions[0]?.question);
-     * DYNAMODBQuestions.
-     */
-
     const router = useRouter();
-    const [currentQuestion, setQuestions] = useState<Question[]>([]); //explain this line
+    const [currentQuestion, setQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setQuestionIndex] = useState(0);
     const [swipeCount, setSwipeCount] = useState(0);
     const [score, setScore] = useState(0);
     const [timer, setTimer] = useState<number>(5);
 
-    //const question = dynamoDbQuestions.Item?.questions[currentQuestion];
     //====USE EFFECT TO LOAD QUESTIONS ======
     useEffect(() => {
         async function loadQuestions() {
             const response = await fetch('/api/questions');
             const data = await response.json();
-            const result = data.questions;
 
-            //on every render it will be recreated if i used a variable
-            setQuestions(result); //all the questions - set once
-            console.log('this is a result ' + result);
+            setQuestions(data.questions); //all the questions - set once
         }
 
         loadQuestions();
@@ -167,7 +153,7 @@ export default function Game() {
 
     //this function generates a random question when the timer is out
     const handleTimeOut = useCallback(() => {
-        setQuestionIndex((c) => c + 1); //-DYNAMODB Question increments
+        setQuestionIndex((c) => c + 1);
         setTimer(5);
         setSwipeCount((c) => c + 1);
     }, []);
@@ -179,19 +165,15 @@ export default function Game() {
     //swipe function - check that answer is correct
     const handlers = (direction: string) => {
         setTimer(5);
-        //if (index === null) return; //index is state
-
-        //const question = basketballQuestions[index]; //take question from the array
 
         if (question.correctOptionId === 'A' ? 'left' : 'right' === direction) {
             setScore((prevScore) => prevScore + 1);
         }
-        //setIndex(getRandomIndex(basketballQuestions.length));
+
         setSwipeCount((c) => c + 1);
     };
 
-    //this here is where we wnd the game, needs improvement because when swipeount=5 it first does a render then changes page
-    //how do you immediately after the swipe chnage page?
+    //Score endpoint
     useEffect(() => {
         if (swipeCount === 5) {
             router.push(`/score?score=${score}`);
@@ -199,7 +181,7 @@ export default function Game() {
     }, [swipeCount, score, router]);
 
     const question = currentQuestion[currentQuestionIndex];
-    console.log('this is a test' + currentQuestion[currentQuestionIndex]);
+
     if (!question) {
         return <p>Loading...</p>;
     }
