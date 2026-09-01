@@ -1,28 +1,41 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Game, { type Question } from './page';
 
 const push = jest.fn();
-const getRandomIndex = jest.fn<number, [number]>(() => 0);
+const fetchMock = jest.fn();
+
+const mockQuestions: Question[] = Array.from({ length: 6 }, (_, index) => ({
+    active: true,
+    options: [
+        { id: 'A', text: `Incorrect answer ${index + 1}` },
+        { id: 'B', text: `Correct answer ${index + 1}` },
+    ],
+    correctOptionId: 'B',
+    category: 'NBA',
+    question: `Test question ${index + 1}?`,
+    ID: `q-${index + 1}`,
+    imageA: `/images/player-a-${index + 1}.jpg`,
+    imageB: `/images/player-b-${index + 1}.jpg`,
+}));
 
 jest.mock('next/navigation', () => ({
     useRouter: () => ({ push }),
 }));
 
-jest.mock('@/utils/getRandomIndex', () => ({
-    getRandomIndex: (length: number) => getRandomIndex(length),
-}));
-
 jest.mock('../components/playerQuestions/Questions', () => ({
     __esModule: true,
-    default: ({ question, handleSwipe }: { question: Question; handleSwipe: (direction: string) => void }) => (
-        <section>
-            <p>{question.question}</p>
-            <button onClick={() => handleSwipe(question.answer.position)}>Correct swipe</button>
-            <button onClick={() => handleSwipe(question.answer.position === 'left' ? 'right' : 'left')}>
-                Incorrect swipe
-            </button>
-        </section>
-    ),
+    default: ({ question, handleSwipe }: { question: Question; handleSwipe: (direction: string) => void }) => {
+        const correctDirection = question.correctOptionId === 'A' ? 'left' : 'right';
+        const incorrectDirection = correctDirection === 'left' ? 'right' : 'left';
+
+        return (
+            <section>
+                <p>{question.question}</p>
+                <button onClick={() => handleSwipe(correctDirection)}>Correct swipe</button>
+                <button onClick={() => handleSwipe(incorrectDirection)}>Incorrect swipe</button>
+            </section>
+        );
+    },
 }));
 
 jest.mock('../components/questionTimer/Timer', () => ({
@@ -38,59 +51,73 @@ jest.mock('../components/questionTimer/Timer', () => ({
 
 beforeEach(() => {
     push.mockClear();
-    getRandomIndex.mockClear();
-    getRandomIndex.mockReturnValue(0);
+    fetchMock.mockReset();
+    fetchMock.mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ questions: mockQuestions }),
+    } as Response);
+    global.fetch = fetchMock as typeof fetch;
 });
 
-test('starts with a question, a five-second timer, and no completed swipes', () => {
+test('loads the first question with a five-second timer and no completed swipes', async () => {
     render(<Game />);
 
-    expect(screen.getByText('Who won the NBA Finals MVP in 2019?')).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(await screen.findByText('Test question 1?')).toBeInTheDocument();
     expect(screen.getByText('Timer: 5')).toBeInTheDocument();
     expect(screen.getByText('Swipes: 0')).toBeInTheDocument();
-    expect(getRandomIndex).toHaveBeenCalledWith(15);
+    expect(fetchMock).toHaveBeenCalledWith('/api/questions');
 });
 
-test('a correct swipe advances the game and contributes to the final score', () => {
+test('five correct swipes contribute to the final score', async () => {
     render(<Game />);
+    await screen.findByText('Test question 1?');
 
     for (let swipe = 1; swipe <= 5; swipe += 1) {
         fireEvent.click(screen.getByRole('button', { name: 'Correct swipe' }));
         expect(screen.getByText(`Swipes: ${swipe}`)).toBeInTheDocument();
     }
 
-    expect(push).toHaveBeenCalledTimes(1);
-    expect(push).toHaveBeenCalledWith('/score?score=5');
+    await waitFor(() => {
+        expect(push).toHaveBeenCalledWith('/score?score=5');
+    });
 });
 
-test('an incorrect swipe advances the game without increasing the score', () => {
+test('incorrect swipes do not increase the final score', async () => {
     render(<Game />);
+    await screen.findByText('Test question 1?');
 
     for (let swipe = 1; swipe <= 5; swipe += 1) {
         fireEvent.click(screen.getByRole('button', { name: 'Incorrect swipe' }));
     }
 
-    expect(push).toHaveBeenCalledWith('/score?score=0');
+    await waitFor(() => {
+        expect(push).toHaveBeenCalledWith('/score?score=0');
+    });
 });
 
-test('a timeout resets the timer, advances the question, and counts as a turn', () => {
-    getRandomIndex.mockReturnValueOnce(0).mockReturnValueOnce(1);
+test('a timeout resets the timer, advances the question, and counts as a turn', async () => {
     render(<Game />);
+    await screen.findByText('Test question 1?');
 
     fireEvent.click(screen.getByRole('button', { name: 'Time up' }));
 
-    expect(screen.getByText('Who scored 81 points in a single NBA game?')).toBeInTheDocument();
+    expect(screen.getByText('Test question 2?')).toBeInTheDocument();
     expect(screen.getByText('Timer: 5')).toBeInTheDocument();
     expect(screen.getByText('Swipes: 1')).toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
 });
 
-test('timeouts do not award points', () => {
+test('five timeouts finish the game without awarding points', async () => {
     render(<Game />);
+    await screen.findByText('Test question 1?');
 
     for (let turn = 0; turn < 5; turn += 1) {
         fireEvent.click(screen.getByRole('button', { name: 'Time up' }));
     }
 
-    expect(push).toHaveBeenCalledWith('/score?score=0');
+    await waitFor(() => {
+        expect(push).toHaveBeenCalledWith('/score?score=0');
+    });
 });

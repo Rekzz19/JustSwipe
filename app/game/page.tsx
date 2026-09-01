@@ -3,23 +3,25 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { getRandomIndex } from '@/utils/getRandomIndex';
 import Questions from '../components/playerQuestions/Questions';
 import Timer from '../components/questionTimer/Timer';
 
-type Answer = {
-    name: string;
-    position: 'left' | 'right';
-};
+interface Option {
+    id: string;
+    text: string;
+}
 
 export interface Question {
+    active: boolean;
+    options: Option[];
+    correctOptionId: string;
+    category: string;
     question: string;
-    answer: Answer;
-    option: string;
+    ID: string;
     imageA: string;
     imageB: string;
 }
-
+/*
 const basketballQuestions: Question[] = [
     {
         question: 'Who won the NBA Finals MVP in 2019?',
@@ -127,18 +129,35 @@ const basketballQuestions: Question[] = [
         imageB: '/images/David-Robinson.jpg',
     },
 ];
+*/
 
 export default function Game() {
     const router = useRouter();
-    //const randomIndex = getRandomIndex();
-    const [index, setIndex] = useState(() => getRandomIndex(basketballQuestions.length));
+    const [currentQuestion, setQuestions] = useState<Question[]>([]);
+    const [currentQuestionIndex, setQuestionIndex] = useState(0);
     const [swipeCount, setSwipeCount] = useState(0);
     const [score, setScore] = useState(0);
     const [timer, setTimer] = useState<number>(5);
 
+    //====USE EFFECT TO LOAD QUESTIONS ======
+    useEffect(() => {
+        async function loadQuestions() {
+            const response = await fetch('/api/questions');
+
+            if (!response.ok) {
+                throw new Error(`Questions request failed; ${response.status}`);
+            }
+            const data = await response.json(); //what is this does not run, you need to handle the errors
+
+            setQuestions(data.questions); //all the questions - set once
+        }
+
+        loadQuestions();
+    }, []);
+
     //this function generates a random question when the timer is out
     const handleTimeOut = useCallback(() => {
-        setIndex(getRandomIndex(basketballQuestions.length));
+        setQuestionIndex((c) => c + 1);
         setTimer(5);
         setSwipeCount((c) => c + 1);
     }, []);
@@ -150,29 +169,26 @@ export default function Game() {
     //swipe function - check that answer is correct
     const handlers = (direction: string) => {
         setTimer(5);
-        if (index === null) return; //index is state
 
-        const question = basketballQuestions[index]; //take question from the array
-
-        if (question.answer.position === direction) {
+        if (question.correctOptionId === 'A' ? 'left' : 'right' === direction) {
             setScore((prevScore) => prevScore + 1);
         }
-        setIndex(getRandomIndex(basketballQuestions.length));
+
         setSwipeCount((c) => c + 1);
     };
 
-    //this here is where we wnd the game, needs improvement because when swipeount=5 it first does a render then changes page
-    //how do you immediately after the swipe chnage page?
+    //Score endpoint
     useEffect(() => {
         if (swipeCount === 5) {
             router.push(`/score?score=${score}`);
         }
     }, [swipeCount, score, router]);
 
-    if (index === null) {
+    const question = currentQuestion[currentQuestionIndex];
+
+    if (!question) {
         return <p>Loading...</p>;
     }
-    const question = basketballQuestions[index];
 
     return (
         <div className="flex flex-col items-center min-h-screen bg-[#0C2340]">

@@ -17,13 +17,13 @@ export default function Questions({ question, handleSwipe }: QuestionsProps) {
                     <PlayersCard
                         direction="left"
                         image={question.imageA}
-                        name={question.answer.name}
+                        name={question.options[0].text}
                         onSwipe={handleSwipe}
                     />
                     <PlayersCard
                         direction="right"
                         image={question.imageB}
-                        name={question.option}
+                        name={question.options[1].text}
                         onSwipe={handleSwipe}
                     />
                 </div>
