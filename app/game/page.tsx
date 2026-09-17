@@ -173,14 +173,28 @@ export default function Game() {
         if (question.correctOptionId === 'A' ? 'left' : 'right' === direction) {
             setScore((prevScore) => prevScore + 1);
         }
-
+        setQuestionIndex((c) => c + 1);
         setSwipeCount((c) => c + 1);
     };
 
     //Score endpoint
     useEffect(() => {
         if (swipeCount === 5) {
+            async function sendScore() {
+                await fetch('/api/score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        playerScore: score,
+                    }),
+                });
+            }
+
             router.push(`/score?score=${score}`);
+
+            sendScore();
         }
     }, [swipeCount, score, router]);
 
