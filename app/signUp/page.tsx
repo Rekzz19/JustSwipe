@@ -4,7 +4,7 @@ import { type SubmitEvent, useState } from 'react';
 import { cognitoSignUp } from '../aws/auth/cognitoAuth';
 import { useRouter } from 'next/navigation';
 
-export default function signUp() {
+export default function SignUp() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

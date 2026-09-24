@@ -14,7 +14,7 @@ export async function POST(request: Request) {
             return Response.json({ message: 'Username and password are required' }, { status: 400 });
         }
 
-        const result = await initiateAuth({ username, password });
+        await initiateAuth({ username, password });
         return Response.json({ success: true }, { status: 200 });
     } catch (error) {
         console.error('Sign-in failed', error);
