@@ -10,7 +10,8 @@ const verifier = CognitoJwtVerifier.create({
 //need the endpoint to call this function
 export async function verifyJwt(token: string) {
     try {
-        return await verifier.verify(token);
+        const data = await verifier.verify(token);
+        return data;
     } catch (error) {
         console.error('Error verifying jwt:' + error);
         return null;

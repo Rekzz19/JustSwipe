@@ -179,22 +179,28 @@ export default function Game() {
 
     //Score endpoint
     useEffect(() => {
+        //store score
         if (swipeCount === 5) {
-            async function sendScore() {
-                await fetch('/api/score', {
+            async function storeScore() {
+                const response = await fetch('/api/postScore', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        playerScore: score,
+                        score: score,
                     }),
                 });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error ?? 'User verification failed'); //check this
+                }
             }
 
             router.push(`/score?score=${score}`);
 
-            sendScore();
+            storeScore();
         }
     }, [swipeCount, score, router]);
 
