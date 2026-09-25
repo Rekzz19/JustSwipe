@@ -8,6 +8,10 @@ export default function Home() {
     const handlePlayButton = () => {
         router.push('/game');
     };
+
+    const handleSignUpButton = () => {
+        router.push('/signUp');
+    };
     return (
         <div className="flex flex-col flex-1 items-center justify-center text-center bg-[#0C2340] font-sans">
             <main>
@@ -15,6 +19,9 @@ export default function Home() {
                 <p>Test your hoop knowledge</p>
                 <div className="border rounded-md mt-5">
                     <button onClick={handlePlayButton}>PLAY</button>
+                </div>
+                <div className="border rounded-md mt-5">
+                    <button onClick={handleSignUpButton}>Sign up</button>
                 </div>
             </main>
         </div>

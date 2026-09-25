@@ -173,14 +173,34 @@ export default function Game() {
         if (question.correctOptionId === 'A' ? 'left' : 'right' === direction) {
             setScore((prevScore) => prevScore + 1);
         }
-
+        setQuestionIndex((c) => c + 1);
         setSwipeCount((c) => c + 1);
     };
 
     //Score endpoint
     useEffect(() => {
+        //store score
         if (swipeCount === 5) {
+            async function storeScore() {
+                const response = await fetch('/api/postScore', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        score: score,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error ?? 'User verification failed'); //check this
+                }
+            }
+
             router.push(`/score?score=${score}`);
+
+            storeScore();
         }
     }, [swipeCount, score, router]);
 
