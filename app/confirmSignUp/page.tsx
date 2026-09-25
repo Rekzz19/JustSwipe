@@ -1,20 +1,19 @@
 'use client';
 
-import { type SubmitEvent, useState } from 'react';
+import { type SubmitEvent, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { confirmSignUp } from '../aws/auth/confirmSignup';
 
-export default function ConfirmSignUp() {
+function ConfirmationForm() {
     const searchParams = useSearchParams();
     const username = searchParams.get('username');
-
     const router = useRouter();
-
     const [code, setCode] = useState('');
 
     async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
+
         if (!username) {
             return;
         }
@@ -40,6 +39,13 @@ export default function ConfirmSignUp() {
 
             <button>Confirm account</button>
         </form>
+    );
+}
+export default function ConfirmSignUpPage() {
+    return (
+        <Suspense fallback={<p>Loading confirmation form...</p>}>
+            <ConfirmationForm />
+        </Suspense>
     );
 }
 
