@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import Game, { type Question } from './page';
+import GameClient from './GameClient';
+import type { Question } from './types';
 
 const push = jest.fn();
 const fetchMock = jest.fn();
@@ -61,7 +62,7 @@ beforeEach(() => {
 });
 
 test('loads the first question with a five-second timer and no completed swipes', async () => {
-    render(<Game />);
+    render(<GameClient />);
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(await screen.findByText('Test question 1?')).toBeInTheDocument();
@@ -71,7 +72,7 @@ test('loads the first question with a five-second timer and no completed swipes'
 });
 
 test('five correct swipes contribute to the final score', async () => {
-    render(<Game />);
+    render(<GameClient />);
     await screen.findByText('Test question 1?');
 
     for (let swipe = 1; swipe <= 5; swipe += 1) {
@@ -85,7 +86,7 @@ test('five correct swipes contribute to the final score', async () => {
 });
 
 test('incorrect swipes do not increase the final score', async () => {
-    render(<Game />);
+    render(<GameClient />);
     await screen.findByText('Test question 1?');
 
     for (let swipe = 1; swipe <= 5; swipe += 1) {
@@ -98,7 +99,7 @@ test('incorrect swipes do not increase the final score', async () => {
 });
 
 test('a timeout resets the timer, advances the question, and counts as a turn', async () => {
-    render(<Game />);
+    render(<GameClient />);
     await screen.findByText('Test question 1?');
 
     fireEvent.click(screen.getByRole('button', { name: 'Time up' }));
@@ -110,7 +111,7 @@ test('a timeout resets the timer, advances the question, and counts as a turn', 
 });
 
 test('five timeouts finish the game without awarding points', async () => {
-    render(<Game />);
+    render(<GameClient />);
     await screen.findByText('Test question 1?');
 
     for (let turn = 0; turn < 5; turn += 1) {

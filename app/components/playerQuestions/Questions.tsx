@@ -1,4 +1,4 @@
-import { Question } from '@/app/game/page';
+import type { Question } from '@/app/game/types';
 import QuestionCard from './QuestionCard';
 import PlayersCard from './PlayerCard';
 

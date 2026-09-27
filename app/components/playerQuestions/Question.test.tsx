@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Questions from './Questions';
-import { Question } from '@/app/game/page';
+import type { Question } from '@/app/game/types';
 
 const mockQuestions: Question = {
     active: true,

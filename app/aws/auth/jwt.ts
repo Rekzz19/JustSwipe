@@ -17,3 +17,12 @@ export async function verifyJwt(token: string) {
         return null;
     }
 }
+
+/* have a function that for a given sub, is there a score with todays date, if so 
+no game 
+
+ALSO at the poinyt of scoring if they is a record decline it 
+
+Non authorised users 
+
+*/

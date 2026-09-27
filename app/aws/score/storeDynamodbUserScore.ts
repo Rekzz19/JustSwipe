@@ -19,7 +19,7 @@ export async function storeScore({ username, sub, score }: StoreScoreType) {
                         userId: sub,
                         username,
                         recordId: today,
-                        highScore: score,
+                        highScore: score, //this is meant to be score kmt
                     },
                     ConditionExpression: 'attribute_not_exists(userId) AND attribute_not_exists(recordId)',
                 },
