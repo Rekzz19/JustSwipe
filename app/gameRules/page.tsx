@@ -3,6 +3,7 @@ export default function GameRules() {
         <>
             <div>
                 <h1> TEN QUESTIONS TODAY </h1>
+                <button>PLAY</button>
             </div>
         </>
     );
