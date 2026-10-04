@@ -24,3 +24,5 @@ export async function userState(userSub: string) {
 }
 
 //you can use a try clock so that you can catch any errors and it passed down the route.
+//NEXT handle unauthorised user errors and ensure score of the same date is handled.
+//ensure guest players only play once.
