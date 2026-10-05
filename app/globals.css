@@ -82,3 +82,198 @@ body {
     color: var(--foreground);
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Shared account and results pages. */
+.account-page {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 3rem 1.25rem;
+    background: radial-gradient(ellipse at top, #173958, #0c2340 65%);
+    color: #f5f7fa;
+}
+.account-wrap {
+    width: 100%;
+    max-width: 28rem;
+}
+.account-brand {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 2rem;
+    font-family: var(--font-bebas), sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.06em;
+}
+.account-brand span {
+    color: #a4d65e;
+}
+.account-card {
+    padding: 2rem;
+    border: 1px solid #365069;
+    border-radius: 1.25rem;
+    background: #102b46;
+    box-shadow: 0 20px 60px #04111f40;
+}
+.account-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #a4d65e;
+}
+.account-card h1 {
+    margin-top: 0.65rem;
+    font-family: var(--font-bebas), sans-serif;
+    font-size: 2.5rem;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+}
+.account-description {
+    margin-top: 0.75rem;
+    color: #b9c8d7;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.account-form {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.75rem;
+}
+.account-field {
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.account-field input {
+    width: 100%;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid #496179;
+    border-radius: 0.6rem;
+    background: #0c2340;
+    color: #f5f7fa;
+    font: inherit;
+    font-weight: 400;
+}
+.account-field input::placeholder {
+    color: #91a7bd;
+}
+.account-field input:focus-visible {
+    outline: 2px solid #a4d65e;
+    outline-offset: 3px;
+}
+.account-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    background: #a4d65e;
+    color: #10243a;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.account-button:hover {
+    background: #b6e37a;
+}
+.account-button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+.account-page a:focus-visible,
+.account-button:focus-visible {
+    outline: 2px solid #a4d65e;
+    outline-offset: 4px;
+}
+.account-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: #b9c8d7;
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+.account-footer a,
+.account-error a {
+    color: #c1e993;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.account-tagline {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #91a7bd;
+}
+.account-error {
+    padding: 0.8rem 1rem;
+    border: 1px solid #f2a5a550;
+    border-radius: 0.6rem;
+    background: #f2a5a510;
+    color: #ffc5c5;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+.account-card > .account-error {
+    margin-top: 1.5rem;
+}
+.score-result {
+    margin: 1.75rem 0;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid #365069;
+    border-radius: 0.8rem;
+    background: #0c2340;
+}
+.score-number {
+    font-family: var(--font-bebas), sans-serif;
+    font-size: 6rem;
+    line-height: 1.2;
+    color: #a4d65e;
+    overflow-wrap: anywhere;
+}
+.score-caption {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #b9c8d7;
+}
+.account-description + .account-button {
+    margin-top: 1.75rem;
+}
+@media (max-width: 380px) {
+    .account-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Home shares the account design with a spacious, simple layout. */
+.home-page .account-card {
+    padding-block: 3rem;
+    text-align: center;
+}
+.home-page .account-card h1 {
+    font-size: 3.5rem;
+}
+.home-page .account-description {
+    margin-top: 1rem;
+}
+.home-actions {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+}
+.home-actions .account-button {
+    min-height: 3.25rem;
+}
+.home-secondary {
+    border: 1px solid #496179;
+    background: transparent;
+    color: #f5f7fa;
+}
+.home-secondary:hover {
+    background: #1b3a56;
+}
