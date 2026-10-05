@@ -1,18 +1,38 @@
-'use client'; //why do i do this?
+'use client';
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import PageCard from '../components/PageCard';
 
 function ScoreContent() {
-    const param = useSearchParams();
-    const score = param.get('score');
+    const score = useSearchParams().get('score');
+    const hasScore = score !== null && score.trim() !== '' && Number.isFinite(Number(score)) && Number(score) >= 0;
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#0C2340]">
-            <div>
-                <h1>You scored {score}</h1>
-            </div>
-        </div>
+        <PageCard
+            eyebrow="ROUND COMPLETE"
+            title={hasScore ? 'Nice work!' : 'No score yet'}
+            description={
+                hasScore
+                    ? 'Every round puts your hoop knowledge to the test.'
+                    : 'Complete a round to see your score here.'
+            }
+        >
+            {hasScore && (
+                <div className="score-result">
+                    <p className="account-eyebrow">YOUR SCORE</p>
+                    <p className="score-number">{Number(score)}</p>
+                    <p className="score-caption">Keep your basketball knowledge sharp.</p>
+                </div>
+            )}
+            <Link className="account-button" href="/">
+                Back to home
+            </Link>
+            <p className="account-footer">
+                <Link href="/gameRules">View game rules</Link>
+            </p>
+        </PageCard>
     );
 }
 
@@ -20,15 +40,12 @@ export default function Score() {
     return (
         <Suspense
             fallback={
-                <div className="flex min-h-screen items-center justify-center bg-[#0C2340]">
-                    <h1>Loading score...</h1>
-                </div>
+                <PageCard eyebrow="ROUND COMPLETE" title="Your results" description="Loading your score…">
+                    <p role="status">Please wait…</p>
+                </PageCard>
             }
         >
             <ScoreContent />
         </Suspense>
     );
 }
-
-//test the page receives a score from parameter
-//i need a better way of handling score
