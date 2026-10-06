@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import Questions from '../components/playerQuestions/Questions';
 import Timer from '../components/questionTimer/Timer';
-import type { Question } from './types';
+import type { Question, Answer } from './types';
 
 /*
 const basketballQuestions: Question[] = [
@@ -120,9 +120,13 @@ const basketballQuestions: Question[] = [
 export default function GameClient() {
     const router = useRouter();
     const [currentQuestion, setQuestions] = useState<Question[]>([]);
+    const [answers, setAnswers] = useState<Answer[]>([]);
     const [currentQuestionIndex, setQuestionIndex] = useState(0);
     const [swipeCount, setSwipeCount] = useState(0);
-    const [score, setScore] = useState(0);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const completedIndex = useRef(-1);
+    const submitted = useRef(false);
+    const question = currentQuestion[currentQuestionIndex];
     const [timer, setTimer] = useState<number>(5);
 
     //====USE EFFECT TO LOAD QUESTIONS ======
@@ -141,56 +145,60 @@ export default function GameClient() {
         loadQuestions();
     }, []);
 
-    //this function generates a random question when the timer is out
-    const handleTimeOut = useCallback(() => {
-        setQuestionIndex((c) => c + 1);
-        setTimer(5);
-        setSwipeCount((c) => c + 1);
-    }, []);
+    // Swipes and timeouts complete the same turn. Guard against both firing together.
+    //study and understand this chnage
+    const completeTurn = useCallback(
+        (direction: Answer['answerDir']) => {
+            if (!question || swipeCount >= 5 || completedIndex.current === currentQuestionIndex) {
+                return;
+            }
+            completedIndex.current = currentQuestionIndex;
+            setAnswers((previous) => [...previous, { questionID: question.ID, answerDir: direction }]);
+            setQuestionIndex((c) => c + 1);
+            setSwipeCount((c) => c + 1);
+            setTimer(5);
+        },
+        [question, swipeCount, currentQuestionIndex]
+    );
 
-    useEffect(() => {
-        console.log('swipeCount changed:', swipeCount); //this is sayong print for every chnage in state
-    }, [swipeCount]);
-
-    //swipe function - check that answer is correct
-    const handlers = (direction: string) => {
-        setTimer(5);
-
-        if (question.correctOptionId === 'A' ? 'left' : 'right' === direction) {
-            setScore((prevScore) => prevScore + 1);
-        }
-        setQuestionIndex((c) => c + 1);
-        setSwipeCount((c) => c + 1);
-    };
+    const handleTimeOut = useCallback(() => completeTurn(null), [completeTurn]);
+    const handlers = (direction: Answer['answerDir']) => completeTurn(direction);
 
     //Score endpoint
     useEffect(() => {
         //store score
-        if (swipeCount === 5) {
+        if (swipeCount === 5 && !submitted.current) {
+            submitted.current = true;
             async function storeScore() {
-                const response = await fetch('/api/postScore', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        score: score,
-                    }),
-                });
+                try {
+                    const response = await fetch('/api/postScore', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userAns: answers, //send an array as the answer to be calculates at the back
+                        }),
+                    });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error ?? 'User verification failed'); //check this
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error ?? 'Unable to submit your score'); //check this
+                    }
+                    const res = await response.json();
+                    router.push(`/score?score=${res.score}`);
+                } catch (error) {
+                    setSubmitError(error instanceof Error ? error.message : 'Unable to submit your score');
                 }
             }
 
-            router.push(`/score?score=${score}`);
-
             storeScore();
         }
-    }, [swipeCount, score, router]);
+    }, [swipeCount, answers, router]);
 
-    const question = currentQuestion[currentQuestionIndex];
+    if (swipeCount >= 5) {
+        return submitError ? <p role="alert">{submitError}</p> : <p>Submitting your score...</p>;
+    }
 
     if (!question) {
         return <p>Loading...</p>;
@@ -203,14 +211,3 @@ export default function GameClient() {
         </div>
     );
 }
-/**
- * this is the page where we take in the timer ad questions component
- * those components takes in props nad functions that are on this main game page
- *
- * TIMER
- * the timer component takes a swipecount prop which is the number of swipes (limited because we want a set number of questions)
- * In the swipe hnadler we use swipeCount to increment the count
- * handletimeout is a function that that gives a new question nad increments swipecount
- * using usecallback ensures it does not run the function on every re render
- *
- */

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import GameClient from './GameClient';
 import type { Question } from './types';
+import { calculateScore } from './calculateScore';
 
 const push = jest.fn();
 const fetchMock = jest.fn();
@@ -53,11 +54,14 @@ jest.mock('../components/questionTimer/Timer', () => ({
 beforeEach(() => {
     push.mockClear();
     fetchMock.mockReset();
-    fetchMock.mockResolvedValue({
+    fetchMock.mockImplementation(async (url: string, options?: RequestInit) => ({
         ok: true,
         status: 200,
-        json: async () => ({ questions: mockQuestions }),
-    } as Response);
+        json: async () =>
+            url === '/api/questions'
+                ? { questions: mockQuestions }
+                : { score: calculateScore(JSON.parse(options?.body as string).userAns, mockQuestions) },
+    }));
     global.fetch = fetchMock as typeof fetch;
 });
 
@@ -77,7 +81,7 @@ test('five correct swipes contribute to the final score', async () => {
 
     for (let swipe = 1; swipe <= 5; swipe += 1) {
         fireEvent.click(screen.getByRole('button', { name: 'Correct swipe' }));
-        expect(screen.getByText(`Swipes: ${swipe}`)).toBeInTheDocument();
+        if (swipe < 5) expect(screen.getByText(`Swipes: ${swipe}`)).toBeInTheDocument();
     }
 
     await waitFor(() => {
@@ -121,4 +125,23 @@ test('five timeouts finish the game without awarding points', async () => {
     await waitFor(() => {
         expect(push).toHaveBeenCalledWith('/score?score=0');
     });
+});
+
+test('mixed swipes and timeouts submit five distinct results and stop play', async () => {
+    render(<GameClient />);
+    await screen.findByText('Test question 1?');
+    for (const action of ['Correct swipe', 'Time up', 'Incorrect swipe', 'Time up', 'Correct swipe']) {
+        fireEvent.click(screen.getByRole('button', { name: action }));
+    }
+    expect(screen.queryByRole('button', { name: 'Time up' })).not.toBeInTheDocument();
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/score?score=2'));
+    const submissions = fetchMock.mock.calls.filter(([url]) => url === '/api/postScore');
+    expect(submissions).toHaveLength(1);
+    expect(JSON.parse(submissions[0][1].body).userAns).toEqual([
+        { questionID: 'q-1', answerDir: 'right' },
+        { questionID: 'q-2', answerDir: null },
+        { questionID: 'q-3', answerDir: 'left' },
+        { questionID: 'q-4', answerDir: null },
+        { questionID: 'q-5', answerDir: 'right' },
+    ]);
 });

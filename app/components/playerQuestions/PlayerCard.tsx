@@ -1,11 +1,12 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import Image from 'next/image';
+import type { Answer } from '@/app/game/types';
 
 type PlayersCardProps = {
     image: string;
     name: string;
-    onSwipe: (direction: string) => void; //onswipe is now a function, framer-motion handles swipe and effect al i need is the function to do something now
-    direction: 'left' | 'right';
+    onSwipe: (direction: Exclude<Answer['answerDir'], null>) => void; //onswipe is now a function, framer-motion handles swipe and effect al i need is the function to do something now
+    direction: Exclude<Answer['answerDir'], null>;
 };
 export default function PlayersCard({ image, name, onSwipe, direction }: PlayersCardProps) {
     const x = useMotionValue(0);
