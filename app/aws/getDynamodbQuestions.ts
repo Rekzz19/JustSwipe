@@ -7,19 +7,19 @@ const docClient = DynamoDBDocumentClient.from(client); //high level client
 
 const today = new Date().toISOString().split('T')[0];
 
-export async function getQuestions() {
+export async function getQuestions(date: string | null) {
     //give return type for function
     //create env variables for the table and region
     const params = {
         TableName: 'jusswipe-daily-questions',
         Key: {
-            date: today,
+            date: date || today,
         },
     };
 
     try {
         const response = await docClient.send(new GetCommand(params));
-        //console.log(response.Item);
+        console.log(response);
         //console.log(response.Item?.questions);
         //console.log('result : ' + JSON.stringify(response));
         //handle missing item (i.e item could be undefined)

@@ -13,3 +13,8 @@ export interface Question {
     imageA: string;
     imageB: string;
 }
+
+export interface Answer {
+    questionID: string;
+    answerDir: 'left' | 'right' | null;
+}

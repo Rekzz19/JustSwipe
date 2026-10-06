@@ -1,10 +1,10 @@
-import type { Question } from '@/app/game/types';
+import type { Question, Answer } from '@/app/game/types';
 import QuestionCard from './QuestionCard';
 import PlayersCard from './PlayerCard';
 
 type QuestionsProps = {
     question: Question;
-    handleSwipe: (direction: string) => void;
+    handleSwipe: (direction: Exclude<Answer['answerDir'], null>) => void;
 };
 
 export default function Questions({ question, handleSwipe }: QuestionsProps) {

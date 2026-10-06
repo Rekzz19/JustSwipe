@@ -14,7 +14,7 @@ export async function userState(userSub: string) {
 
     try {
         const res = await dynamoClient.send(new GetCommand(params));
-        console.log('this ', res);
+        //console.log('this ', res);
         return res;
     } catch (error) {
         console.error('Failed to validate user state', error);
