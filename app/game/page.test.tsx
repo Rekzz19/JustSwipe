@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import GameClient from './GameClient';
+import GameClient from './page';
 import type { Question } from './types';
 import { calculateScore } from './calculateScore';
 
