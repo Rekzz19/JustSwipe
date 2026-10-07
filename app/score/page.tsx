@@ -26,9 +26,14 @@ function ScoreContent() {
                     <p className="score-caption">Keep your basketball knowledge sharp.</p>
                 </div>
             )}
-            <Link className="account-button" href="/">
-                Back to home
-            </Link>
+            <div className="score-actions">
+                <Link className="account-button" href="/leaderboard">
+                    View leaderboard
+                </Link>
+                <Link className="account-button home-secondary" href="/">
+                    Back to home
+                </Link>
+            </div>
             <p className="account-footer">
                 <Link href="/gameRules">View game rules</Link>
             </p>
