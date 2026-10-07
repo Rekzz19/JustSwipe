@@ -25,15 +25,6 @@ export async function GET() {
         userPlayed = true;
     }
 
-    //store the dat they played -
-    if (userPlayed) {
-        cookieStore.set('datePlayed', todaysDate, {
-            httpOnly: true,
-            sameSite: 'lax',
-            path: '/',
-        });
-    }
-
     //console.log('userTest response', res);
     return Response.json({
         played: userPlayed,

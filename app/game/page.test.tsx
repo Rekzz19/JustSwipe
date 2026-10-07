@@ -1,9 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import GameClient from './GameClient';
+import Game from './page';
 import type { Question } from './types';
 import { calculateScore } from './calculateScore';
 
 const push = jest.fn();
+const redirectMock = jest.fn();
 const fetchMock = jest.fn();
 
 const mockQuestions: Question[] = Array.from({ length: 6 }, (_, index) => ({
@@ -22,6 +23,7 @@ const mockQuestions: Question[] = Array.from({ length: 6 }, (_, index) => ({
 
 jest.mock('next/navigation', () => ({
     useRouter: () => ({ push }),
+    redirect: (path: string) => redirectMock(path),
 }));
 
 jest.mock('../components/playerQuestions/Questions', () => ({
@@ -53,30 +55,43 @@ jest.mock('../components/questionTimer/Timer', () => ({
 
 beforeEach(() => {
     push.mockClear();
+    redirectMock.mockClear();
     fetchMock.mockReset();
-    fetchMock.mockImplementation(async (url: string, options?: RequestInit) => ({
-        ok: true,
-        status: 200,
-        json: async () =>
-            url === '/api/questions'
-                ? { questions: mockQuestions }
-                : { score: calculateScore(JSON.parse(options?.body as string).userAns, mockQuestions) },
-    }));
+    fetchMock.mockImplementation(async (url: string, options?: RequestInit) => {
+        switch (url) {
+            case '/api/checkUserState':
+                return { ok: true, status: 200, json: async () => ({ played: false }) };
+            case '/api/questions':
+                return { ok: true, status: 200, json: async () => ({ questions: mockQuestions }) };
+            case '/api/postScore':
+                return {
+                    ok: true,
+                    status: 201,
+                    json: async () => ({
+                        score: calculateScore(JSON.parse(options?.body as string).userAns, mockQuestions),
+                    }),
+                };
+            default:
+                throw new Error(`Unexpected request: ${url}`);
+        }
+    });
     global.fetch = fetchMock as typeof fetch;
 });
 
 test('loads the first question with a five-second timer and no completed swipes', async () => {
-    render(<GameClient />);
+    render(<Game />);
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(await screen.findByText('Test question 1?')).toBeInTheDocument();
     expect(screen.getByText('Timer: 5')).toBeInTheDocument();
     expect(screen.getByText('Swipes: 0')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith('/api/questions');
+    expect(fetchMock).toHaveBeenCalledWith('/api/checkUserState');
+    expect(redirectMock).not.toHaveBeenCalled();
 });
 
 test('five correct swipes contribute to the final score', async () => {
-    render(<GameClient />);
+    render(<Game />);
     await screen.findByText('Test question 1?');
 
     for (let swipe = 1; swipe <= 5; swipe += 1) {
@@ -90,7 +105,7 @@ test('five correct swipes contribute to the final score', async () => {
 });
 
 test('incorrect swipes do not increase the final score', async () => {
-    render(<GameClient />);
+    render(<Game />);
     await screen.findByText('Test question 1?');
 
     for (let swipe = 1; swipe <= 5; swipe += 1) {
@@ -103,7 +118,7 @@ test('incorrect swipes do not increase the final score', async () => {
 });
 
 test('a timeout resets the timer, advances the question, and counts as a turn', async () => {
-    render(<GameClient />);
+    render(<Game />);
     await screen.findByText('Test question 1?');
 
     fireEvent.click(screen.getByRole('button', { name: 'Time up' }));
@@ -115,7 +130,7 @@ test('a timeout resets the timer, advances the question, and counts as a turn', 
 });
 
 test('five timeouts finish the game without awarding points', async () => {
-    render(<GameClient />);
+    render(<Game />);
     await screen.findByText('Test question 1?');
 
     for (let turn = 0; turn < 5; turn += 1) {
@@ -128,7 +143,7 @@ test('five timeouts finish the game without awarding points', async () => {
 });
 
 test('mixed swipes and timeouts submit five distinct results and stop play', async () => {
-    render(<GameClient />);
+    render(<Game />);
     await screen.findByText('Test question 1?');
     for (const action of ['Correct swipe', 'Time up', 'Incorrect swipe', 'Time up', 'Correct swipe']) {
         fireEvent.click(screen.getByRole('button', { name: action }));
@@ -144,4 +159,32 @@ test('mixed swipes and timeouts submit five distinct results and stop play', asy
         { questionID: 'q-4', answerDir: null },
         { questionID: 'q-5', answerDir: 'right' },
     ]);
+});
+
+test('redirects home when the user has already played', async () => {
+    const defaultFetch = fetchMock.getMockImplementation();
+    fetchMock.mockImplementation((url: string, options?: RequestInit) =>
+        url === '/api/checkUserState'
+            ? Promise.resolve({ ok: true, status: 200, json: async () => ({ played: true }) })
+            : defaultFetch!(url, options)
+    );
+    render(<Game />);
+    await waitFor(() => expect(redirectMock).toHaveBeenCalledWith('/'));
+    expect(fetchMock.mock.calls.some(([url]) => url === '/api/postScore')).toBe(false);
+});
+
+test('displays a submission error without navigating to the score page', async () => {
+    const defaultFetch = fetchMock.getMockImplementation();
+    fetchMock.mockImplementation((url: string, options?: RequestInit) =>
+        url === '/api/postScore'
+            ? Promise.resolve({ ok: false, status: 503, json: async () => ({ error: 'Unable to save score' }) })
+            : defaultFetch!(url, options)
+    );
+    render(<Game />);
+    await screen.findByText('Test question 1?');
+    for (let turn = 0; turn < 5; turn += 1) {
+        fireEvent.click(screen.getByRole('button', { name: 'Time up' }));
+    }
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to save score');
+    expect(push).not.toHaveBeenCalled();
 });
