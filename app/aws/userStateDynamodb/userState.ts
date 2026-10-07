@@ -8,7 +8,7 @@ export async function userState(userSub: string) {
         TableName: 'jusswipe-score-dynamodb',
         Key: {
             userId: userSub,
-            recordId: '2026-09-24',
+            recordId: todaysDate,
         },
     };
 

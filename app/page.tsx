@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import PageCard from './components/PageCard';
 
@@ -51,6 +52,9 @@ export default function Home() {
             >
                 <div className="home-actions">
                     {userPlay()}
+                    <Link className="account-button home-secondary" href="/leaderboard">
+                        View leaderboard
+                    </Link>
                     <button className="account-button home-secondary" type="button" onClick={handleSignUpButton}>
                         Sign up
                     </button>

@@ -277,3 +277,109 @@ body {
 .home-secondary:hover {
     background: #1b3a56;
 }
+
+/* Leaderboard: alternating navy and lime rows, separated horizontally. */
+.account-wrap:has(.leaderboard-content) {
+    max-width: 52rem;
+}
+.leaderboard-content {
+    margin-top: 2rem;
+}
+.leaderboard-scroll {
+    overflow-x: auto;
+    border-radius: 0.8rem;
+    background: #0c2340;
+}
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 1.35rem 1.25rem;
+    border-inline: 0;
+    text-align: left;
+}
+.leaderboard-table thead {
+    color: #a4d65e;
+    background: #081b30;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    border-bottom: 2px solid #a4d65e;
+}
+.leaderboard-table tbody tr {
+    background: #0c2340;
+    color: #f5f7fa;
+}
+.leaderboard-table tbody tr:nth-child(even) {
+    background: #a4d65e;
+    color: #10243a;
+}
+.leaderboard-table tbody tr + tr {
+    border-top: 1px solid #365069;
+}
+.leaderboard-table tbody th {
+    max-width: 20rem;
+    overflow-wrap: anywhere;
+    font-weight: 600;
+}
+.leaderboard-table th:first-child,
+.leaderboard-table td:first-child {
+    width: 4.5rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.leaderboard-table th:nth-child(n + 3),
+.leaderboard-table td:nth-child(n + 3) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.leaderboard-rank {
+    color: #a4d65e;
+    font-weight: 700;
+}
+.leaderboard-score {
+    color: #a4d65e;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.leaderboard-table tbody tr:nth-child(even) .leaderboard-rank,
+.leaderboard-table tbody tr:nth-child(even) .leaderboard-score {
+    color: #10243a;
+}
+.leaderboard-table .leaderboard-empty {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #b9c8d7;
+    line-height: 1.6;
+}
+.leaderboard-note,
+.leaderboard-retry {
+    margin-top: 1rem;
+}
+@media (max-width: 480px) {
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 1rem 0.65rem;
+    }
+    .leaderboard-table {
+        font-size: 0.8rem;
+    }
+    .leaderboard-table thead {
+        font-size: 0.6rem;
+        letter-spacing: 0.04em;
+    }
+    .leaderboard-table th:first-child,
+    .leaderboard-table td:first-child {
+        width: 2.5rem;
+    }
+}
+
+.score-actions {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.75rem;
+}
