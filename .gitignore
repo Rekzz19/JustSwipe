@@ -42,3 +42,8 @@ next-env.d.ts
 
 #environment-variables
 .env
+
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
