@@ -20,7 +20,7 @@ export async function storeScore({ username, sub, score }: StoreScoreType) {
                         username,
                         recordId: today,
                         score: score,
-                        leaderboard: 'overall',
+                        leaderboard: 'OVERALL',
                     },
                     ConditionExpression: 'attribute_not_exists(userId) AND attribute_not_exists(recordId)',
                 },
